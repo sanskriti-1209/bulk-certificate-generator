@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bulk Certificate Generator</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">📜</div>
+                <div>
+                    <h1>CertifyBulk</h1>
+                    <p class="tagline">Generate beautiful certificates in seconds</p>
+                </div>
+            </div>
+            <nav class="nav-steps">
+                <div class="step active" data-step="1"><span>1</span> Template</div>
+                <div class="step-line"></div>
+                <div class="step" data-step="2"><span>2</span> Names</div>
+                <div class="step-line"></div>
+                <div class="step" data-step="3"><span>3</span> Customize</div>
+                <div class="step-line"></div>
+                <div class="step" data-step="4"><span>4</span> Download</div>
+            </nav>
+        </header>
+
+        <main class="main-content">
+            <!-- Step 1: Upload Template -->
+            <section class="panel active" id="panel-1">
+                <h2>📁 Choose Your Certificate Template</h2>
+                <p class="panel-desc">Upload your own background image or pick from our built-in templates</p>
+
+                <div class="template-section">
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">☁️</div>
+                        <h3>Drag & Drop Image Here</h3>
+                        <p>or click to browse</p>
+                        <p class="file-hint">Supports: JPG, PNG, WEBP (Recommended: 1600×1100px)</p>
+                        <input type="file" id="templateUpload" accept="image/*" hidden>
+                    </div>
+
+                    <div class="divider-text">— OR choose a built-in template —</div>
+
+                    <div class="builtin-templates">
+                        <div class="template-card selected" data-template="classic">
+                            <canvas id="previewClassic" width="200" height="140"></canvas>
+                            <span>Classic Gold</span>
+                        </div>
+                        <div class="template-card" data-template="modern">
+                            <canvas id="previewModern" width="200" height="140"></canvas>
+                            <span>Modern Blue</span>
+                        </div>
+                        <div class="template-card" data-template="elegant">
+                            <canvas id="previewElegant" width="200" height="140"></canvas>
+                            <span>Elegant Green</span>
+                        </div>
+                        <div class="template-card" data-template="minimal">
+                            <canvas id="previewMinimal" width="200" height="140"></canvas>
+                            <span>Minimal</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uploaded-preview" id="uploadedPreview" style="display:none">
+                    <h3>Uploaded Template Preview</h3>
+                    <img id="uploadedImg" src="" alt="Uploaded template">
+                    <button class="btn btn-danger btn-sm" id="removeUpload">✕ Remove</button>
+                </div>
+
+                <button class="btn btn-primary btn-next" data-next="2">Next: Add Names →</button>
+            </section>
+
+            <!-- Step 2: Import Names -->
+            <section class="panel" id="panel-2">
+                <h2>👥 Add Participant Names</h2>
+                <p class="panel-desc">Type names manually, paste a list, or import from a CSV/Excel file</p>
+
+                <div class="names-input-section">
+                    <div class="input-methods">
+                        <button class="method-btn active" data-method="manual">✏️ Manual Entry</button>
+                        <button class="method-btn" data-method="paste">📋 Paste List</button>
+                        <button class="method-btn" data-method="file">📂 Import File</button>
+                    </div>
+
+                    <div class="method-content active" id="method-manual">
+                        <div class="manual-input-row">
+                            <input type="text" id="nameInput" placeholder="Enter participant name..." class="input-field">
+                            <button class="btn btn-primary" id="addNameBtn">+ Add</button>
+                        </div>
+                    </div>
+
+                    <div class="method-content" id="method-paste">
+                        <textarea id="pasteArea" class="textarea-field" placeholder="Paste names here (one per line)...&#10;&#10;Example:&#10;John Doe&#10;Jane Smith&#10;Alex Johnson" rows="6"></textarea>
+                        <button class="btn btn-primary" id="parsePasteBtn">Add All Names</button>
+                    </div>
+
+                    <div class="method-content" id="method-file">
+                        <div class="file-upload-zone" id="csvUploadZone">
+                            <div class="upload-icon">📄</div>
+                            <h3>Upload CSV or XLSX File</h3>
+                            <p>First column should contain names</p>
+                            <input type="file" id="csvUpload" accept=".csv,.xlsx,.xls,.txt" hidden>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="names-list-section">
+                    <div class="names-header">
+                        <h3>Names List (<span id="nameCount">0</span>)</h3>
+                        <div>
+                            <button class="btn btn-sm btn-secondary" id="selectAllBtn">Select All</button>
+                            <button class="btn btn-sm btn-danger" id="deleteSelectedBtn">Delete Selected</button>
+                            <button class="btn btn-sm btn-danger" id="clearAllBtn">Clear All</button>
+                        </div>
+                    </div>
+                    <div class="names-list" id="namesList">
+                        <div class="empty-state">No names added yet. Start adding names above!</div>
+                    </div>
+                </div>
+
+                <div class="panel-actions">
+                    <button class="btn btn-secondary btn-back" data-next="1">← Back</button>
+                    <button class="btn btn-primary btn-next" data-next="3">Next: Customize →</button>
+                </div>
+            </section>
+
+            <!-- Step 3: Customize -->
+            <section class="panel" id="panel-3">
+                <h2>🎨 Customize Certificate</h2>
+                <p class="panel-desc">Position the name text and adjust styling. Drag the name on the preview to set position!</p>
+
+                <div class="customize-layout">
+                    <div class="preview-container">
+                        <h3>Live Preview</h3>
+                        <div class="canvas-wrapper" id="canvasWrapper">
+                            <canvas id="certificateCanvas" width="1600" height="1100"></canvas>
+                            <div class="drag-handle" id="dragHandle">
+                                <span id="dragText">Sample Name</span>
+                            </div>
+                        </div>
+                        <p class="hint">💡 Drag the name text above to reposition it</p>
+                    </div>
+
+                    <div class="controls-panel">
+                        <div class="control-group">
+                            <label>Preview Name</label>
+                            <select id="previewNameSelect" class="input-field">
+                                <option value="Sample Name">Sample Name</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label>Font Family</label>
+                            <select id="fontFamily" class="input-field">
+                                <option value="Great Vibes">Great Vibes (Script)</option>
+                                <option value="Poppins" selected>Poppins</option>
+                                <option value="Georgia">Georgia (Serif)</option>
+                                <option value="Arial">Arial (Sans)</option>
+                                <option value="Times New Roman">Times New Roman</option>
+                                <option value="Courier New">Courier New (Mono)</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label>Font Size: <span id="fontSizeVal">48</span>px</label>
+                            <input type="range" id="fontSize" min="16" max="120" value="48" class="slider">
+                        </div>
+
+                        <div class="control-group">
+                            <label>Font Weight</label>
+                            <select id="fontWeight" class="input-field">
+                                <option value="normal">Normal</option>
+                                <option value="bold" selected>Bold</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label>Text Color</label>
+                            <div class="color-row">
+                                <input type="color" id="fontColor" value="#1a1a2e" class="color-picker">
+                                <div class="color-presets">
+                                    <div class="preset" style="background:#1a1a2e" data-color="#1a1a2e"></div>
+                                    <div class="preset" style="background:#8B0000" data-color="#8B0000"></div>
+                                    <div class="preset" style="background:#00008B" data-color="#00008B"></div>
+                                    <div class="preset" style="background:#006400" data-color="#006400"></div>
+                                    <div class="preset" style="background:#DAA520" data-color="#DAA520"></div>
+                                    <div class="preset" style="background:#ffffff;border:1px solid #ccc" data-color="#ffffff"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label>Text Alignment</label>
+                            <div class="align-buttons">
+                                <button class="align-btn" data-align="left">◀</button>
+                                <button class="align-btn active" data-align="center">◆</button>
+                                <button class="align-btn" data-align="right">▶</button>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label>Position X: <span id="posXVal">800</span>px</label>
+                            <input type="range" id="posX" min="0" max="1600" value="800" class="slider">
+                        </div>
+
+                        <div class="control-group">
+                            <label>Position Y: <span id="posYVal">550</span>px</label>
+                            <input type="range" id="posY" min="0" max="1100" value="550" class="slider">
+                        </div>
+
+                        <div class="control-group">
+                            <label>
+                                <input type="checkbox" id="addOutline"> Add Text Outline
+                            </label>
+                        </div>
+
+                        <div class="control-group" id="outlineColorGroup" style="display:none">
+                            <label>Outline Color</label>
+                            <input type="color" id="outlineColor" value="#ffffff" class="color-picker">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-actions">
+                    <button class="btn btn-secondary btn-back" data-next="2">← Back</button>
+                    <button class="btn btn-primary btn-next" data-next="4">Next: Download →</button>
+                </div>
+            </section>
+
+            <!-- Step 4: Download -->
+            <section class="panel" id="panel-4">
+                <h2>⬇️ Generate & Download</h2>
+                <p class="panel-desc">Preview all certificates and download them individually or as a batch</p>
+
+                <div class="download-options">
+                    <div class="option-card">
+                        <h3>📸 Download as Images</h3>
+                        <p>Each certificate as a separate PNG file</p>
+                        <div class="btn-group">
+                            <button class="btn btn-primary" id="downloadAllImages">Download All (ZIP)</button>
+                        </div>
+                    </div>
+                    <div class="option-card">
+                        <h3>📄 Download as PDF</h3>
+                        <p>All certificates in a single PDF document</p>
+                        <button class="btn btn-primary" id="downloadPDF">Download Combined PDF</button>
+                    </div>
+                </div>
+
+                <div class="progress-section" id="progressSection" style="display:none">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-text" id="progressText">Generating certificates...</p>
+                </div>
+
+                <div class="generated-preview">
+                    <h3>Certificate Previews</h3>
+                    <div class="preview-grid" id="previewGrid"></div>
+                </div>
+
+                <div class="panel-actions">
+                    <button class="btn btn-secondary btn-back" data-next="3">← Back</button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>Built with ❤️ | CertifyBulk — Bulk Certificate Generator</p>
+        </footer>
+    </div>
+
+    <!-- JSZip for ZIP downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <!-- jsPDF for PDF downloads -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- SheetJS for Excel parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
